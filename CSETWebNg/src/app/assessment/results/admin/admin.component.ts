@@ -161,48 +161,4 @@ export class AdminComponent implements OnInit {
         }
         return rval; 
     }
-    /**
-     *
-     */
-    saveData(data: AdminTableData, type: string) {
-         if((data.documentationHours>1000)||(data.documentationHours<-10) 
-            || isNaN(data.documentationHours)){
-             data.documentationHours = 0;
-            return;
-        }
-        if((data.interviewHours>1000)||(data.interviewHours<-10)
-        || isNaN(data.interviewHours)){
-            data.interviewHours = 0;
-            return;
-        }
-
-
-        const saveData: AdminSaveData = new AdminSaveData();
-        saveData.component = data.component;
-        saveData.reviewType = '';
-        saveData.hours = 1;
-        saveData.otherSpecifyValue = data.otherSpecifyValue;
-
-        if (type === 'doc') {
-            saveData.reviewType = "Documentation";
-            saveData.hours = data.documentationHours;
-        } else if (type === 'int') {
-            saveData.reviewType = "Interview Process";
-            saveData.hours = data.interviewHours;
-        } else if (type === 'other') {
-            // otherspecifyvalue is already set
-        } else {
-            return;
-        }
-
-        this.acetSvc.saveData(saveData).subscribe((resp: AdminSaveResponse) => {
-            this.interviewTotal = resp.interviewTotal;
-            this.grandTotal = resp.grandTotal;
-            this.documentationTotal = resp.documentationTotal;
-        });
-    }
-
-    saveAttribute(data: AttributePair) {
-        this.acetSvc.saveAttribute(data).subscribe();
-    }
 }
