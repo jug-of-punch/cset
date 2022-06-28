@@ -6,15 +6,29 @@ using CSETWebCore.DataLayer.Model;
 
 namespace CSETWebCore.Business.AdminTab
 {
+    /// <summary>
+    /// A class that deals with ACET functionality.
+    /// </summary>
     public class AdminTabBusiness : IAdminTabBusiness
     {
         private CSETContext _context;
 
+
+        /// <summary>
+        /// Constructs a new instance of AdminTabBusiness
+        /// </summary>
+        /// <param name="context"></param>
         public AdminTabBusiness(CSETContext context)
         {
             _context = context;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assessmentId"></param>
+        /// <returns></returns>
         public AdminTabData GetTabData(int assessmentId)
         {
             Dictionary<string, int> countStatementsReviewed = new Dictionary<string, int>();
@@ -59,93 +73,15 @@ namespace CSETWebCore.Business.AdminTab
             rvalue.Attributes = _context.usp_financial_attributes(assessmentId).ToList();
             return rvalue;
         }
+       
 
         /// <summary>
-        /// Saves the number of hours and maybe the OtherSpecifyValue to the FINANCIAL_HOURS database.
+        /// 
         /// </summary>
         /// <param name="assessmentId"></param>
-        /// <param name="save"></param>
-        /// <returns></returns>
-        public AdminSaveResponse SaveData(int assessmentId, AdminSaveData save)
-        {
-            FINANCIAL_HOURS fh = null;
-
-            var items = _context.FINANCIAL_HOURS.Where(x => x.Assessment_Id == assessmentId && x.Component == save.Component).ToList();
-
-            if (items.Count == 0)
-            {
-                // No answers saved yet.  Build both records.
-                fh = CreateNewFinancialHours(assessmentId, save);
-                fh.ReviewType = "Documentation";
-                _context.FINANCIAL_HOURS.Add(fh);
-
-                fh = CreateNewFinancialHours(assessmentId, save);
-                fh.ReviewType = "Interview Process";
-                _context.FINANCIAL_HOURS.Add(fh);
-
-                _context.SaveChanges();
-            }
-            else
-            {
-                foreach (FINANCIAL_HOURS item in items)
-                {
-                    if (item.ReviewType == save.ReviewType || string.IsNullOrEmpty(save.ReviewType))
-                    {
-                        if (item.ReviewType == save.ReviewType)
-                        {
-                            item.Hours = save.Hours;
-                        }
-
-                        item.OtherSpecifyValue = save.OtherSpecifyValue;
-
-                        _context.SaveChanges();
-                    }
-                }
-            }
-
-
-            // Get totals for AdminSaveResponse
-            AdminSaveResponse resp = new AdminSaveResponse
-            {
-                DocumentationTotal = 0,
-                InterviewTotal = 0,
-                GrandTotal = 0,
-                ReviewedTotal = 0
-            };
-            AdminTabData d = GetTabData(assessmentId);
-            foreach (var t in d.ReviewTotals)
-            {
-                switch (t.ReviewType.ToLower())
-                {
-                    case "documentation":
-                        resp.DocumentationTotal += (double)t.Total;
-                        break;
-                    case "interview process":
-                        resp.InterviewTotal += (double)t.Total;
-                        break;
-                }
-            };
-            resp.GrandTotal = (double)d.GrandTotal;
-            //resp.ReviewedTotal = ???;
-
-            return resp;
-        }
-
-        public FINANCIAL_HOURS CreateNewFinancialHours(int assessmentId, AdminSaveData save)
-        {
-            return new FINANCIAL_HOURS()
-            {
-                Assessment_Id = assessmentId,
-                Component = save.Component,
-                ReviewType = save.ReviewType,
-                Hours = save.Hours,
-                OtherSpecifyValue = save.OtherSpecifyValue
-            };
-        }
-
+        /// <param name="att"></param>
         public void SaveDataAttribute(int assessmentId, AttributePair att)
         {
-
             var item = _context.FINANCIAL_ASSESSMENT_VALUES.Where(x => x.Assessment_Id == assessmentId && x.AttributeName == att.AttributeName).FirstOrDefault();
             if (item == null)
             {

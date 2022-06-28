@@ -57,10 +57,6 @@ export class ACETService {
         return this.http.get(this.apiUrl + 'admintab/Data');
     }
 
-    saveData(data: AdminSaveData) {
-        return this.http.post(this.apiUrl + 'admintab/save', data, headers);
-    }
-
     saveAttribute(data: AttributePair) {
         return this.http.post(this.apiUrl + 'admintab/saveattribute', data, headers);
     }

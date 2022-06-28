@@ -32,14 +32,6 @@ namespace CSETWebCore.Api.Controllers
             return Ok(_tabBusiness.GetTabData(assessmentId));
         }
 
-        [HttpPost]
-        [Route("api/admintab/save")]
-        public IActionResult SaveData([FromBody] AdminSaveData save)
-        {
-            int assessmentId = _tokenManager.AssessmentForUser();
-            return Ok(_tabBusiness.SaveData(assessmentId, save));
-        }
-
 
         [HttpPost]
         [Route("api/admintab/saveattribute")]
