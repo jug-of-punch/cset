@@ -433,6 +433,11 @@ namespace CSETWebCore.Business.Maturity
 
             _context.SaveChanges();
 
+
+            // create or delete IRP headers
+            ManageIrpHeaders(assessmentId, modelName == "ACET");            
+
+
             SetDefaultTargetLevels(assessmentId, modelName);
             _assessmentUtil.TouchAssessment(assessmentId);
         }
@@ -1543,5 +1548,58 @@ namespace CSETWebCore.Business.Maturity
             var msfm = new MaturityStructureForModel(modelId, _context);
             return msfm;
         }
+
+
+        /// <summary>
+        /// Create new headers for IRP calculations
+        /// </summary>
+        /// <param name="assessmentId"></param>
+        public void ManageIrpHeaders(int assessmentId, bool createHeaders)
+        {
+            if (!createHeaders)
+            {
+                var headers = _context.ASSESSMENT_IRP_HEADER.Where(x => x.ASSESSMENT_ID == assessmentId).ToList();
+                _context.ASSESSMENT_IRP_HEADER.RemoveRange(headers);
+                _context.SaveChanges();
+                return;
+            }
+
+            int idOffset = 1;
+
+            foreach (IRP_HEADER header in _context.IRP_HEADER)
+            {
+                IRPSummary summary = new IRPSummary();
+                summary.HeaderText = header.Header;
+
+                ASSESSMENT_IRP_HEADER headerInfo = _context.ASSESSMENT_IRP_HEADER.FirstOrDefault(h =>
+                    h.IRP_HEADER.IRP_Header_Id == header.IRP_Header_Id &&
+                    h.ASSESSMENT.Assessment_Id == assessmentId);
+
+                summary.RiskLevel = 0;
+                headerInfo = new ASSESSMENT_IRP_HEADER()
+                {
+                    RISK_LEVEL = 0,
+                    IRP_HEADER = header
+                };
+                headerInfo.ASSESSMENT_ID = assessmentId;
+                if (_context.ASSESSMENT_IRP_HEADER.Count() == 0)
+                {
+                    headerInfo.HEADER_RISK_LEVEL_ID = header.IRP_Header_Id;
+                }
+                else
+                {
+                    headerInfo.HEADER_RISK_LEVEL_ID =
+                        _context.ASSESSMENT_IRP_HEADER.Max(i => i.HEADER_RISK_LEVEL_ID) + idOffset;
+                    idOffset++;
+                }
+
+                summary.RiskLevelId = headerInfo.HEADER_RISK_LEVEL_ID ?? 0;
+
+                _context.ASSESSMENT_IRP_HEADER.Add(headerInfo);
+            }
+
+            _context.SaveChanges();
+        }
+
     }
 }

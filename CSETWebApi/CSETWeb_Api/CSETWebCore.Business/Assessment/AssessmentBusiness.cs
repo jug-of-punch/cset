@@ -97,12 +97,8 @@ namespace CSETWebCore.Business.Assessment
                 _standardsBusiness.PersistDefaultSelectedStandard(assessment_id);
             }
 
-
-            CreateIrpHeaders(assessment_id);
-
             return newAssessment;
         }
-
 
 
         public AssessmentDetail CreateNewAssessmentForImport(int currentUserId)
@@ -519,54 +515,7 @@ namespace CSETWebCore.Business.Assessment
 
             return assessmentId;
         }
-
-
-        /// <summary>
-        /// Create new headers for IRP calculations
-        /// </summary>
-        /// <param name="assessmentId"></param>
-        public void CreateIrpHeaders(int assessmentId)
-        {
-            int idOffset = 1;
-
-            // now just properties on an Assessment
-            ASSESSMENTS assessment = _context.ASSESSMENTS.FirstOrDefault(a => a.Assessment_Id == assessmentId);
-
-            foreach (IRP_HEADER header in _context.IRP_HEADER)
-            {
-                IRPSummary summary = new IRPSummary();
-                summary.HeaderText = header.Header;
-
-                ASSESSMENT_IRP_HEADER headerInfo = _context.ASSESSMENT_IRP_HEADER.FirstOrDefault(h =>
-                    h.IRP_HEADER.IRP_Header_Id == header.IRP_Header_Id &&
-                    h.ASSESSMENT.Assessment_Id == assessmentId);
-
-                summary.RiskLevel = 0;
-                headerInfo = new ASSESSMENT_IRP_HEADER()
-                {
-                    RISK_LEVEL = 0,
-                    IRP_HEADER = header
-                };
-                headerInfo.ASSESSMENT = assessment;
-                if (_context.ASSESSMENT_IRP_HEADER.Count() == 0)
-                {
-                    headerInfo.HEADER_RISK_LEVEL_ID = header.IRP_Header_Id;
-                }
-                else
-                {
-                    headerInfo.HEADER_RISK_LEVEL_ID =
-                        _context.ASSESSMENT_IRP_HEADER.Max(i => i.HEADER_RISK_LEVEL_ID) + idOffset;
-                    idOffset++;
-                }
-
-                summary.RiskLevelId = headerInfo.HEADER_RISK_LEVEL_ID ?? 0;
-
-                _context.ASSESSMENT_IRP_HEADER.Add(headerInfo);
-            }
-
-            _context.SaveChanges();
-        }
-
+        
 
         /// <summary>
         /// Default a few things
