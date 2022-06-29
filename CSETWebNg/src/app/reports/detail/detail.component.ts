@@ -81,7 +81,7 @@ export class DetailComponent implements OnInit, AfterViewInit, AfterViewChecked 
     public reportSvc: ReportService,
     public configSvc: ConfigService,
     private titleService: Title,
-    public acetSvc: ACETService,
+    //public acetSvc: ACETService,
     private sanitizer: DomSanitizer
   ) { }
 
@@ -177,37 +177,37 @@ export class DetailComponent implements OnInit, AfterViewInit, AfterViewChecked 
       this.networkDiagramImage = this.sanitizer.bypassSecurityTrustHtml(x.diagram);
     });
 
-    this.acetSvc.getMatDetailList().subscribe(
-      (data) => {
-        this.matDetails = data;
-      },
-      error => {
-        console.log('Error getting all documents: ' + (<Error>error).name + (<Error>error).message);
-        console.log('Error getting all documents: ' + (<Error>error).stack);
-      });
+    // this.acetSvc.getMatDetailList().subscribe(
+    //   (data) => {
+    //     this.matDetails = data;
+    //   },
+    //   error => {
+    //     console.log('Error getting all documents: ' + (<Error>error).name + (<Error>error).message);
+    //     console.log('Error getting all documents: ' + (<Error>error).stack);
+    //   });
 
-    this.acetSvc.getAcetDashboard().subscribe(
-      (data: AcetDashboard) => {
-        this.acetDashboard = data;
+    // this.acetSvc.getAcetDashboard().subscribe(
+    //   (data: AcetDashboard) => {
+    //     this.acetDashboard = data;
 
-        for (let i = 0; i < this.acetDashboard.irps.length; i++) {
-          this.acetDashboard.irps[i].comment = this.acetSvc.interpretRiskLevel(this.acetDashboard.irps[i].riskLevel);
-        }
-      },
-      error => {
-        console.log('Error getting all documents: ' + (<Error>error).name + (<Error>error).message);
-        console.log('Error getting all documents: ' + (<Error>error).stack);
-      });
+    //     for (let i = 0; i < this.acetDashboard.irps.length; i++) {
+    //       this.acetDashboard.irps[i].comment = this.acetSvc.interpretRiskLevel(this.acetDashboard.irps[i].riskLevel);
+    //     }
+    //   },
+    //   error => {
+    //     console.log('Error getting all documents: ' + (<Error>error).name + (<Error>error).message);
+    //     console.log('Error getting all documents: ' + (<Error>error).stack);
+    //   });
 
-    this.acetSvc.getAdminData().subscribe(
-      (data: AdminPageData) => {
-        this.adminPageData = data;
-        this.processAcetAdminData();
-      },
-      error => {
-        console.log('Error getting all documents: ' + (<Error>error).name + (<Error>error).message);
-        console.log('Error getting all documents: ' + (<Error>error).stack);
-      });
+    // this.acetSvc.getAdminData().subscribe(
+    //   (data: AdminPageData) => {
+    //     this.adminPageData = data;
+    //     this.processAcetAdminData();
+    //   },
+    //   error => {
+    //     console.log('Error getting all documents: ' + (<Error>error).name + (<Error>error).message);
+    //     console.log('Error getting all documents: ' + (<Error>error).stack);
+    //   });
   }
 
   /**
